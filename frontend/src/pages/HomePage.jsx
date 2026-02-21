@@ -1,12 +1,43 @@
 import { useProducts } from "../hooks/useProducts";
-import { PackageIcon, SparklesIcon } from "lucide-react";
+import { PackageIcon } from "lucide-react";
 import { Link } from "react-router";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCard from "../components/ProductCard";
 import { SignInButton } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
 import img from "../assets/img.svg";
+import { useState, useEffect } from "react";
+const stats = [
+  { value: 10000, label: "Products" },
+  { value: 5000, label: "Creators" },
+  { value: 1000000, label: "Downloads" },
+  { value: 120, label: "Countries" },
+];
 
+function CountUp({ end, duration = 2000 }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const increment = end / (duration / 16);
+
+    const counter = setInterval(() => {
+      start += increment;
+      if (start >= end) {
+        clearInterval(counter);
+        setCount(end);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+
+    return () => clearInterval(counter);
+  }, [end, duration]);
+
+  if (end >= 1000000) return <>{Math.floor(count / 1000000)}M+</>;
+  if (end >= 1000) return <>{Math.floor(count / 1000)}K+</>;
+  return <>{count}+</>;
+}
 function HomePage() {
   const { data: products = [], isLoading, error } = useProducts();
 
@@ -19,110 +50,160 @@ function HomePage() {
       </div>
     );
   }
-
   return (
-    <div className="space-y-16 overflow-hidden">
-      <div className="space-y-2 overflow-hidden py-4">
-        {[0, 1].map((i) => (
+    <div className="relative space-y-8 overflow-hidden">
+      {/* Background Blobs */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <motion.div
+          className="absolute w-96 h-96 bg-primary/20 rounded-full blur-3xl"
+          animate={{ x: [0, 100, -50, 0], y: [0, -80, 50, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-3xl"
+          animate={{ x: [0, -120, 40, 0], y: [0, 60, -40, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+
+      {/*  Announcement Bar */}
+      <div className="bg-primary text-primary-content text-center py-2 text-sm font-medium">
+        🎉 New creators joined today — Start selling now!
+      </div>
+
+      {/*  Infinite Banner */}
+      <div className="overflow-hidden border-y border-base-300 py-4">
+        <motion.div
+          className="flex gap-16 text-lg font-semibold whitespace-nowrap"
+          animate={{ x: ["0%", "-100%"] }}
+          transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+        >
+          {[
+            "🚀 Upload",
+            "🔥 Sell",
+            "💎 Digital",
+            "🎨 Creative",
+            "⚡ Fast",
+            "🌍 Global",
+            "🚀 Upload",
+            "🔥 Sell",
+            "💎 Digital",
+            "🎨 Creative",
+            "⚡ Fast",
+            "🌍 Global",
+          ].map((item, i) => (
+            <span key={i} className="text-primary">
+              {item}
+            </span>
+          ))}
+        </motion.div>
+      </div>
+
+      {/*  HERO SECTION */}
+      <div className="px-6">
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto py-16">
+          {/* LEFT */}
+          <div className="space-y-6">
+            <h1 className="text-5xl font-extrabold leading-tight">
+              Discover & Share{" "}
+              <span className="text-primary">Amazing Products</span>
+            </h1>
+
+            <p className="text-base-content/60 text-lg">
+              A modern marketplace built for creators. Upload, explore, connect,
+              and monetize your digital assets.
+            </p>
+
+            <div className="flex gap-4 flex-wrap">
+              <SignInButton mode="modal">
+                <button className="btn btn-primary btn-lg">
+                  Start Selling
+                </button>
+              </SignInButton>
+
+              <Link to="/products" className="btn btn-outline btn-lg">
+                Explore Now
+              </Link>
+            </div>
+
+            {/* Category Pills */}
+            <div className="flex flex-wrap gap-3 pt-4">
+              {[
+                "UI Kits",
+                "Templates",
+                "Ebooks",
+                "Icons",
+                "Courses",
+                "Designs",
+              ].map((cat) => (
+                <span
+                  key={cat}
+                  className="px-4 py-2 bg-base-200 rounded-full text-sm"
+                >
+                  {cat}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT COLLAGE */}
+          <div className="grid grid-cols-2 gap-4">
+            <img src={img} className="rounded-xl shadow-lg" />
+            <img src={img} className="rounded-xl shadow-lg translate-y-6" />
+            <img src={img} className="rounded-xl shadow-lg col-span-2" />
+          </div>
+        </div>
+      </div>
+
+      {/*  FEATURED PRODUCTS */}
+      {products.length > 0 && (
+        <div className="px-6 max-w-7xl mx-auto space-y-6">
+          <h2 className="text-2xl font-bold">🔥 Featured Products</h2>
+
+          <div className="flex gap-6 overflow-x-auto pb-4">
+            {products.slice(0, 6).map((product) => (
+              <div key={product.id} className="min-w-[280px]">
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/*  STATS STRIP */}
+      <div className="grid grid-cols-2 md:grid-cols-4 bg-base-300 py-16 text-center gap-6">
+        {stats.map((stat, i) => (
           <motion.div
             key={i}
-            className="flex gap-16 whitespace-nowrap font-semibold text-primary text-lg"
-            animate={{ x: i === 0 ? ["0%", "-100%"] : ["-100%", "0%"] }}
-            transition={{
-              repeat: Infinity,
-              duration: 25,
-              ease: "linear",
-            }}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: i * 0.2 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.08 }}
+            className="space-y-3 p-6 rounded-2xl cursor-pointer transition-all duration-300 hover:bg-base-200 hover:shadow-xl"
           >
-            <span>🚀 Build</span>
-            <span>✨ Create</span>
-            <span>💎 Monetize</span>
-            <span>🔥 Scale</span>
-            <span>🚀 Build</span>
-            <span>✨ Create</span>
-            <span>💎 Monetize</span>
+            <div className="text-4xl font-extrabold text-primary">
+              <CountUp end={stat.value} />
+            </div>
+            <div className="text-base-content/70 text-lg font-medium">
+              {stat.label}
+            </div>
           </motion.div>
         ))}
       </div>
 
-      {/* HERO */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="hero bg-gradient-to-br from-base-300 via-base-200 to-base-300 rounded-box overflow-hidden"
-      >
-        <div className="hero-content flex-col lg:flex-row-reverse gap-16 py-14">
-          {/* Floating Image */}
-          <motion.div
-            animate={{ y: [0, -15, 0] }}
-            transition={{
-              repeat: Infinity,
-              duration: 4,
-              ease: "easeInOut",
-            }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-110" />
-            <img
-              src={img}
-              alt="Creator"
-              className="relative h-64 lg:h-80 rounded-2xl shadow-2xl"
-            />
-          </motion.div>
+      {/* Decorative Divider */}
+      <div className="h-24 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 rounded-xl mx-6" />
 
-          <div className="text-center lg:text-left space-y-4">
-            <motion.h1
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-4xl lg:text-6xl font-extrabold leading-tight"
-            >
-              Share Your{" "}
-              <span className="text-primary relative">
-                Products
-                <motion.span
-                  layoutId="underline"
-                  className="absolute left-0 -bottom-1 h-1 w-full bg-primary"
-                />
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-base-content/60"
-            >
-              Upload, discover, and connect with creators in a modern
-              marketplace.
-            </motion.p>
-
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <SignInButton mode="modal">
-                <button className="btn btn-primary shadow-lg">
-                  <SparklesIcon className="size-4" />
-                  Start Selling
-                </button>
-              </SignInButton>
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* PRODUCTS */}
-      <div>
-        <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
+      {/*  ALL PRODUCTS */}
+      <div className="px-6 max-w-7xl mx-auto space-y-6">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           <PackageIcon className="size-5 text-primary" />
           All Products
         </h2>
 
         {products.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="card bg-base-300"
-          >
+          <div className="card bg-base-300">
             <div className="card-body items-center text-center py-16">
               <PackageIcon className="size-16 text-base-content/20" />
               <h3 className="card-title text-base-content/50">
@@ -135,36 +216,32 @@ function HomePage() {
                 Create Product
               </Link>
             </div>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: {
-                transition: {
-                  staggerChildren: 0.15,
-                },
-              },
-            }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product) => (
-              <motion.div
-                key={product.id}
-                variants={{
-                  hidden: { opacity: 0, y: 40 },
-                  visible: { opacity: 1, y: 0 },
-                }}
-                whileHover={{ y: -5 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
+              <ProductCard key={product.id} product={product} />
             ))}
-          </motion.div>
+          </div>
         )}
+      </div>
+
+      {/*  CTA SECTION */}
+      <div className="px-6 max-w-5xl mx-auto pb-20">
+        <div className="rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 p-12 text-center shadow-xl">
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to Launch Your First Product?
+          </h2>
+          <p className="text-base-content/60 mb-6">
+            Join thousands of creators building their digital future.
+          </p>
+
+          <SignInButton mode="modal">
+            <button className="btn btn-primary btn-lg shadow-lg">
+              Get Started Now
+            </button>
+          </SignInButton>
+        </div>
       </div>
     </div>
   );
