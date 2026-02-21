@@ -70,10 +70,10 @@ function ThemeSelector() {
             >
               <span className="capitalize">{t}</span>
               <div className="flex gap-0.5" data-theme={t}>
-                <span className="w-2 h-4 rounded-sm bg-primary" />
-                <span className="w-2 h-4 rounded-sm bg-secondary" />
-                <span className="w-2 h-4 rounded-sm bg-accent" />
-                <span className="w-2 h-4 rounded-sm bg-neutral" />
+                <span className="w-2 h-4 bg-primary" />
+                <span className="w-2 h-4  bg-secondary" />
+                <span className="w-2 h-4  bg-accent" />
+                <span className="w-2 h-4  bg-neutral" />
               </div>
             </button>
           </li>

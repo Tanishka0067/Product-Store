@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ProductCard from "../components/ProductCard";
 import { SignInButton } from "@clerk/clerk-react";
-
+import img from "../assets/img.svg";
 function HomePage() {
   const { data: products, isLoading, error } = useProducts();
 
@@ -26,7 +26,7 @@ function HomePage() {
           <div className="relative">
             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-110" />
             <img
-              src="/image.png"
+              src={img}
               alt="Creator"
               className="relative h-64 lg:h-72 rounded-2xl shadow-2xl"
             />
@@ -68,7 +68,7 @@ function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((product) => (
+            {products && products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

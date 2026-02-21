@@ -9,7 +9,7 @@ export const syncUser = async (userData) => {
 // Products API
 export const getAllProducts = async () => {
   const { data } = await api.get("/products");
-  return data;
+return data?.products ?? data ?? [];
 };
 
 export const getProductById = async (id) => {
